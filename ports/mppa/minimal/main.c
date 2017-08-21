@@ -49,7 +49,7 @@
 #include "lwip/ip4_frag.h"
 #include "lwip/udp.h"
 #include "lwip/tcp.h"
-#include "netif/tapif.h"
+#include "netif/odpif.h"
 #include "netif/etharp.h"
 
 #include "lwip/apps/snmp.h"
@@ -86,6 +86,8 @@ static struct option longopts[] = {
   {"debug", no_argument,        NULL, 'd'},
   /* help */
   {"help", no_argument, NULL, 'h'},
+  /* interface */
+  {"interface", required_argument, NULL, 'f'},
   /* gateway address */
   {"gateway", required_argument, NULL, 'g'},
   /* ip address */
@@ -116,6 +118,7 @@ main(int argc, char **argv)
   struct netif netif;
   int ch;
   char ip_str[16] = {0}, nm_str[16] = {0}, gw_str[16] = {0};
+  void *iface = (void *)(intptr_t)"e0";
 
   /* startup defaults (may be overridden by one or more opts) */
   IP4_ADDR(&gw, 192,168,0,1);
@@ -128,7 +131,7 @@ main(int argc, char **argv)
   /* use debug flags defined by debug.h */
   debug_flags = LWIP_DBG_OFF;
 
-  while ((ch = getopt_long(argc, argv, "dhg:i:m:t:", longopts, NULL)) != -1) {
+  while ((ch = getopt_long(argc, argv, "dhf:g:i:m:t:", longopts, NULL)) != -1) {
     switch (ch) {
       case 'd':
         debug_flags |= (LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT);
@@ -137,6 +140,9 @@ main(int argc, char **argv)
         usage();
         exit(0);
         break;
+	  case 'f':
+		iface = optarg;
+		break;
       case 'g':
         ip4addr_aton(optarg, &gw);
         break;
@@ -179,12 +185,12 @@ main(int argc, char **argv)
 
   printf("TCP/IP initialized.\n");
 
-  netif_add(&netif, &ipaddr, &netmask, &gw, NULL, tapif_init, ethernet_input);
+  netif_add(&netif, &ipaddr, &netmask, &gw, iface, odpif_init, ethernet_input);
   netif_set_default(&netif);
   netif_set_up(&netif);
 #if LWIP_IPV6
   netif_create_ip6_linklocal_address(&netif, 1);
-#endif 
+#endif
 
 #if LWIP_SNMP
   /* initialize our private example MIB */
@@ -207,18 +213,22 @@ main(int argc, char **argv)
   snmp_init();
 #endif /* LWIP_SNMP */
 
+#if LWIP_UDP
   udpecho_raw_init();
+#endif /* LWIP_UDP */
+
+#if LWIP_TCP
   tcpecho_raw_init();
+#endif /* LWIP_TCP */
 
   printf("Applications started.\n");
-    
 
   while (1) {
     /* poll netif, pass packet to lwIP */
-    tapif_select(&netif);
+    odpif_select(&netif);
 
     sys_check_timeouts();
   }
-  
+
   return 0;
 }

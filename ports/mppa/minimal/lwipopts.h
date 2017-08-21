@@ -47,8 +47,9 @@
 /** 
  * NO_SYS==1: Provides VERY minimal functionality. Otherwise,
  * use lwIP facilities.
+ * MPPA PORT ONLY: DO NOT REDEFINE IT HERE, USE NO_SYS VARIABLE IN MAKEFILE INSTEAD
+ * #define NO_SYS                          1
  */
-#define NO_SYS                          1
 
 /**
  * SYS_LIGHTWEIGHT_PROT==1: if you want inter-task protection for certain
@@ -150,20 +151,20 @@
 
 /**
  * MEMP_NUM_TCPIP_MSG_API: the number of struct tcpip_msg, which are used
- * for callback/timeout API communication. 
+ * for callback/timeout API communication.
  * (only needed if you use tcpip.c)
  */
-#define MEMP_NUM_TCPIP_MSG_API          0
+#define MEMP_NUM_TCPIP_MSG_API          16
 
 /**
  * MEMP_NUM_TCPIP_MSG_INPKT: the number of struct tcpip_msg, which are used
- * for incoming packets. 
+ * for incoming packets.
  * (only needed if you use tcpip.c)
  */
-#define MEMP_NUM_TCPIP_MSG_INPKT        0
+#define MEMP_NUM_TCPIP_MSG_INPKT        16
 
 /**
- * PBUF_POOL_SIZE: the number of buffers in the pbuf pool. 
+ * PBUF_POOL_SIZE: the number of buffers in the pbuf pool.
  */
 #define PBUF_POOL_SIZE                  32
 
@@ -292,9 +293,9 @@
  * LWIP_SNMP==1: Turn on SNMP module. UDP must be available for SNMP
  * transport.
  */
-#define LWIP_SNMP                       1
+#define LWIP_SNMP                       0
 #define LWIP_MIB2_CALLBACKS             0
-#define MIB2_STATS                      1
+#define MIB2_STATS                      0
 
 /*
    ----------------------------------
@@ -325,7 +326,7 @@
 /**
  * LWIP_UDP==1: Turn on UDP.
  */
-#define LWIP_UDP                        1
+#define LWIP_UDP                        0
 
 /**
  * LWIP_UDPLITE==1: Turn on UDP-Lite. (Requires LWIP_UDP)
@@ -357,7 +358,7 @@
  * link level header. The default is 14, the standard value for
  * Ethernet.
  */
-#define PBUF_LINK_HLEN                  16
+#define PBUF_LINK_HLEN                  14
 
 /*
    ------------------------------------
@@ -407,32 +408,28 @@
    ---------------------------------------
 */
 
-#define TAPIF_DEBUG      LWIP_DBG_ON
-#define TUNIF_DEBUG      LWIP_DBG_OFF
-#define UNIXIF_DEBUG     LWIP_DBG_OFF
-#define DELIF_DEBUG      LWIP_DBG_OFF
-#define SIO_FIFO_DEBUG   LWIP_DBG_OFF
-#define TCPDUMP_DEBUG    LWIP_DBG_ON
-#define API_LIB_DEBUG    LWIP_DBG_ON
-#define API_MSG_DEBUG    LWIP_DBG_ON
-#define TCPIP_DEBUG      LWIP_DBG_ON
-#define NETIF_DEBUG      LWIP_DBG_ON
-#define SOCKETS_DEBUG    LWIP_DBG_ON
-#define DEMO_DEBUG       LWIP_DBG_ON
-#define IP_DEBUG         LWIP_DBG_ON
-#define IP_REASS_DEBUG   LWIP_DBG_ON
-#define RAW_DEBUG        LWIP_DBG_ON
-#define ICMP_DEBUG       LWIP_DBG_ON
-#define UDP_DEBUG        LWIP_DBG_ON
-#define TCP_DEBUG        LWIP_DBG_ON
-#define TCP_INPUT_DEBUG  LWIP_DBG_ON
-#define TCP_OUTPUT_DEBUG LWIP_DBG_ON
-#define TCP_RTO_DEBUG    LWIP_DBG_ON
-#define TCP_CWND_DEBUG   LWIP_DBG_ON
-#define TCP_WND_DEBUG    LWIP_DBG_ON
-#define TCP_FR_DEBUG     LWIP_DBG_ON
-#define TCP_QLEN_DEBUG   LWIP_DBG_ON
-#define TCP_RST_DEBUG    LWIP_DBG_ON
+#define API_LIB_DEBUG    LWIP_DBG_OFF
+#define API_MSG_DEBUG    LWIP_DBG_OFF
+#define TCPIP_DEBUG      LWIP_DBG_OFF
+#define NETIF_DEBUG      LWIP_DBG_OFF
+#define SOCKETS_DEBUG    LWIP_DBG_OFF
+#define DEMO_DEBUG       LWIP_DBG_OFF
+#define PBUF_DEBUG       LWIP_DBG_OFF
+#define ETHARP_DEBUG     LWIP_DBG_OFF
+#define IP_DEBUG         LWIP_DBG_OFF
+#define IP_REASS_DEBUG   LWIP_DBG_OFF
+#define RAW_DEBUG        LWIP_DBG_OFF
+#define ICMP_DEBUG       LWIP_DBG_OFF
+#define UDP_DEBUG        LWIP_DBG_OFF
+#define TCP_DEBUG        LWIP_DBG_OFF
+#define TCP_INPUT_DEBUG  LWIP_DBG_OFF
+#define TCP_OUTPUT_DEBUG LWIP_DBG_OFF
+#define TCP_RTO_DEBUG    LWIP_DBG_OFF
+#define TCP_CWND_DEBUG   LWIP_DBG_OFF
+#define TCP_WND_DEBUG    LWIP_DBG_OFF
+#define TCP_FR_DEBUG     LWIP_DBG_OFF
+#define TCP_QLEN_DEBUG   LWIP_DBG_OFF
+#define TCP_RST_DEBUG    LWIP_DBG_OFF
 
 extern unsigned char debug_flags;
 #define LWIP_DBG_TYPES_ON debug_flags

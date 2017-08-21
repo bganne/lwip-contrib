@@ -29,13 +29,36 @@
 # Author: Adam Dunkels <adam@sics.se>
 #
 
+NO_SYS?=1
+SIMU?=0
+
+ifeq ($(SIMU),0)
+TARGET:=hw
+else
+TARGET:=simu
+endif
+
+CC:=k1-gcc
+AR:=k1-ar
+LD:=k1-ld
+
 # Architecture specific files.
-LWIPARCH?=$(CONTRIBDIR)/ports/unix/port
+LWIPARCH?=$(CONTRIBDIR)/ports/mppa/port
 SYSARCH?=$(LWIPARCH)/sys_arch.c
-ARCHFILES=$(LWIPARCH)/perf.c $(SYSARCH) $(LWIPARCH)/netif/tapif.c $(LWIPARCH)/netif/tunif.c \
-	$(LWIPARCH)/netif/unixif.c $(LWIPARCH)/netif/list.c $(LWIPARCH)/netif/tcpdump.c \
-	$(LWIPARCH)/netif/delif.c $(LWIPARCH)/netif/sio.c $(LWIPARCH)/netif/fifo.c
+ARCHFILES=$(LWIPARCH)/perf.c $(SYSARCH) \
+		  $(LWIPARCH)/netif/dummyif.c \
+		  $(LWIPARCH)/netif/odpif.c \
+		  $(LWIPARCH)/netif/pktio.c
 
 include ../../Common.allports.mk
 
-LDFLAGS+=-pthread -lutil -lrt
+CFLAGS+= -march=k1b -mhypervisor -ffunction-sections -fdata-sections -DNO_SYS=$(NO_SYS)
+LDFLAGS+= -mhypervisor -lodp -lmppapower -lmpparouting -lmppanoc -Wl,--gc-sections
+
+ifeq ($(NO_SYS),1)
+CFLAGS+= -mos=bare
+LDFLAGS+= -lutask -L$(K1_TOOLCHAIN_DIR)/lib/odp/$(TARGET)/k1b-kalray-mos -L$(K1_TOOLCHAIN_DIR)/k1-elf/lib/mOS
+else
+CFLAGS+= -mos=nodeos -pthread
+LDFLAGS+= -pthread -L$(K1_TOOLCHAIN_DIR)/lib/odp/$(TARGET)/k1b-kalray-nodeos -L$(K1_TOOLCHAIN_DIR)/k1-nodeos/lib/mOS
+endif

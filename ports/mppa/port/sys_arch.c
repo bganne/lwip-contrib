@@ -61,9 +61,15 @@
 #include <mach/mach_time.h>
 #endif
 
+#ifdef __k1__
+#include <mOS_vcore_u.h>
+#endif /* __k1__ */
+
 #include "lwip/sys.h"
 #include "lwip/opt.h"
 #include "lwip/stats.h"
+
+#if !NO_SYS
 
 static void
 get_monotonic_time(struct timespec *ts)
@@ -82,8 +88,6 @@ get_monotonic_time(struct timespec *ts)
   clock_gettime(CLOCK_MONOTONIC, ts);
 #endif
 }
-
-#if !NO_SYS
 
 static struct sys_thread *threads = NULL;
 static pthread_mutex_t threads_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -566,19 +570,27 @@ sys_mutex_free(struct sys_mutex **mutex)
 u32_t
 sys_now(void)
 {
+#ifdef __k1__
+  return mOS_dsu_ts_read();
+#else /* !__k1__ */
   struct timespec ts;
 
   get_monotonic_time(&ts);
   return (u32_t)(ts.tv_sec * 1000L + ts.tv_nsec / 1000000L);
+#endif /* __k1__ */
 }
 
 u32_t
 sys_jiffies(void)
 {
+#ifdef __k1__
+  return mOS_dsu_ts_read();
+#else /* !__k1__ */
   struct timespec ts;
 
   get_monotonic_time(&ts);
   return (u32_t)(ts.tv_sec * 1000000000L + ts.tv_nsec);
+#endif /* __k1__ */
 }
 
 /*-----------------------------------------------------------------------------------*/
