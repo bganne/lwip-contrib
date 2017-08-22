@@ -164,7 +164,7 @@ low_level_input(struct netif *netif)
   p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
   if (p != NULL) {
     pbuf_take(p, eth, len);
-    /* acknowledge that packet has been read(); */
+    odp_packet_free(pkt);
   } else {
     /* drop packet(); */
     MIB2_STATS_NETIF_INC(netif, ifindiscards);
