@@ -19,7 +19,7 @@
 #include "netif/pktio.h"
 
 #define MTU 9000
-#define PKTBUF 100
+#define PKTBUF 10
 
 /* Forward declarations. */
 static void odpif_input(struct netif *netif);
@@ -38,12 +38,15 @@ static void
 low_level_init(struct netif *netif)
 {
   int err;
+  odp_platform_init_t platform_params = {0};
   odp_pool_param_t params;
   struct odpif *odpif = (struct odpif *)netif->state;
 
   LWIP_DEBUGF(NETIF_DEBUG, ("odpif_init for iface '%s'.\n", odpif->name));
 
-  err = odp_init_global(NULL, NULL);
+  platform_params.n_rx_thr = 1;
+  platform_params.sort_buffers = 1;
+  err = odp_init_global(NULL, &platform_params);
   if (err) {
 	  perror("odpif_init: odp_init_global() failed");
 	  exit(1);
@@ -163,6 +166,7 @@ low_level_input(struct netif *netif)
   /* We allocate a pbuf chain of pbufs from the pool. */
   p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
   if (p != NULL) {
+    INVALIDATE_AREA(eth, len);
     pbuf_take(p, eth, len);
     odp_packet_free(pkt);
   } else {
