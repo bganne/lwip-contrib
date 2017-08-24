@@ -5,6 +5,7 @@
 
 #include "lwip/debug.h"
 #include "lwip/def.h"
+#include "lwip/etharp.h"
 #include "lwip/ip.h"
 #include "lwip/mem.h"
 #include "lwip/stats.h"
@@ -133,6 +134,15 @@ low_level_output(struct netif *netif, struct pbuf *p)
   return ERR_OK;
 }
 
+static void arp_workaround(struct netif *inp, const struct eth_hdr *eth, int len)
+{
+	const struct ip_hdr *ip = (const struct ip_hdr *)(eth + 1);
+	if (len < (int)(sizeof(*eth) + sizeof(*ip))
+			|| 0x0008 != eth->type) return;
+	etharp_update_arp_entry(inp, (const ip4_addr_t *)&ip->src, &(eth->src),
+			ETHARP_FLAG_TRY_HARD);
+}
+
 /*-----------------------------------------------------------------------------------*/
 /*
  * low_level_input():
@@ -163,10 +173,12 @@ low_level_input(struct netif *netif)
   eth = odp_packet_l2_ptr(pkt, &len)
   MIB2_STATS_NETIF_ADD(netif, ifinoctets, len);
 
+  INVALIDATE_AREA(eth, len);
+  arp_workaround(netif, (const struct eth_hdr *)eth, len);
+
   /* We allocate a pbuf chain of pbufs from the pool. */
   p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
   if (p != NULL) {
-    INVALIDATE_AREA(eth, len);
     pbuf_take(p, eth, len);
     odp_packet_free(pkt);
   } else {
