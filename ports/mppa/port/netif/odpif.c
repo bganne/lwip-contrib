@@ -20,7 +20,7 @@
 #include "netif/pktio.h"
 
 #define MTU 9000
-#define PKTBUF 10
+#define PKTBUF 64
 
 /* Forward declarations. */
 static void odpif_input(struct netif *netif);
