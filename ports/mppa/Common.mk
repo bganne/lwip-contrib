@@ -30,13 +30,7 @@
 #
 
 NO_SYS?=1
-SIMU?=0
-
-ifeq ($(SIMU),0)
-TARGET:=hw
-else
-TARGET:=simu
-endif
+TARGET?=hw # possible values: hw, simu
 
 CC:=k1-gcc
 AR:=k1-ar

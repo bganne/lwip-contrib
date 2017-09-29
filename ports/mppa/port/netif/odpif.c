@@ -278,13 +278,14 @@ odpif_select(struct netif *netif)
 static void
 odpif_thread(void *arg)
 {
+  struct netif *netif;
   int err = odp_init_local(ODP_THREAD_WORKER);
   if (err) {
 	  perror("odpif_thread: odp_init_local() failed");
 	  exit(1);
   }
 
-  struct netif *netif = (struct netif *)arg;
+  netif = (struct netif *)arg;
   for (;;) {
 	  /* Handle incoming packet. */
 	  odpif_input(netif);

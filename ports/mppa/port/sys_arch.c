@@ -391,7 +391,7 @@ sys_sem_new_internal(u8_t count)
   if (sem != NULL) {
     sem->c = count;
     pthread_condattr_init(&(sem->condattr));
-#if !(defined(LWIP_UNIX_MACH) || (defined(LWIP_UNIX_ANDROID) && __ANDROID_API__ < 21))
+#if !(defined(LWIP_UNIX_MACH) || defined(__k1__) || (defined(LWIP_UNIX_ANDROID) && __ANDROID_API__ < 21))
     pthread_condattr_setclock(&(sem->condattr), CLOCK_MONOTONIC);
 #endif
     pthread_cond_init(&(sem->cond), &(sem->condattr));

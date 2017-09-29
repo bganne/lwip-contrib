@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
+#include <omp.h>
 
 #include "lwip/init.h"
 
@@ -223,12 +224,22 @@ main(int argc, char **argv)
 
   printf("Applications started.\n");
 
+#if NO_SYS
   while (1) {
     /* poll netif, pass packet to lwIP */
     odpif_select(&netif);
 
     sys_check_timeouts();
   }
+#else /* NO_SYS */
+  while (1) {
+#pragma omp parallel num_threads(14)
+	  {
+#pragma omp critical
+		  printf("Hello from worker %i\n", omp_get_thread_num());
+	  }
+  }
+#endif /* NO_SYS */
 
   return 0;
 }

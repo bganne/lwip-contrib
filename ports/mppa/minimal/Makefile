@@ -29,6 +29,11 @@
 # Author: Adam Dunkels <adam@sics.se>
 #
 
+NO_SYS:=0
+TARGET:=simu
+CFLAGS:=-fopenmp
+LDFLAGS:=-fopenmp
+
 all ipv4 compile: echop
 .PHONY: all
 
